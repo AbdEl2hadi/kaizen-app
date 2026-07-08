@@ -1,0 +1,34 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*.local
+*.local
+
+# Frontend — Node / TanStack Start / Vite
+node_modules/
+dist/
+dist-ssr/
+.nitro/
+.tanstack/
+.wrangler/
+.output/
+.vinxi/
+__unconfig*
+todos.json
+
+# Backend — Go
+apps/backend/bin/
+*.exe
+*.test
+*.out
+vendor/
+tmp/
