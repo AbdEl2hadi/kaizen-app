@@ -1,0 +1,57 @@
+### GET request to example server
+GET http://localhost:4040/health
+
+### Register
+POST http://localhost:4040/v1/auth/register
+Content-Type: application/json
+
+{
+  "fullName": "John Doe",
+  "username": "john_doe",
+  "email": "kaiden.2h2@gmail.com",
+  "password": "password123",
+  "confirmPassword": "password123",
+  "dateOfBirth": "2000-01-01",
+  "timeZone" :"Europe/London"
+}
+
+### Verify Email
+POST http://localhost:4040/v1/auth/verify-email
+Content-Type: application/json
+
+{
+  "rawToken" : ""
+}
+
+### Login
+POST http://localhost:4040/v1/auth/login
+Content-Type: application/json
+
+{
+  "identity": "john_doe",
+  "password": "password123"
+}
+
+### Resend Verification
+POST http://localhost:4040/v1/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "kaiden.2h2@gmail.com"
+}
+
+### Logout
+POST http://localhost:4040/v1/auth/logout
+
+### Google OAuth Login (redirects to Google)
+GET http://localhost:4040/v1/auth/google
+
+### Google OAuth Callback (handles redirect from Google)
+GET http://localhost:4040/v1/auth/google/callback
+
+### GitHub OAuth Login (redirects to GitHub)
+GET http://localhost:4040/v1/auth/github
+
+### GitHub OAuth Callback (handles redirect from GitHub)
+GET http://localhost:4040/v1/auth/github/callback
+

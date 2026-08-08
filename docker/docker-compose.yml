@@ -1,0 +1,16 @@
+
+services:
+  kaizen_db:
+    image: postgres:16-alpine
+    container_name: kaizen_local_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local_password123
+      POSTGRES_DB: kaizen_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - kaizen_db_data:/var/lib/postgresql/data
+
+volumes:
+  kaizen_db_data:

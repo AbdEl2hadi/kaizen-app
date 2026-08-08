@@ -6,7 +6,10 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import { Toaster } from 'sonner'
+import { TooltipProvider } from "@/components/ui/tooltip"
+
+import { TanStackQueryDevtools } from '../integrations/tanstack-query/devtools'
 import { ThemeProvider } from '#/providers/theme-provider'
 
 import appCss from '../styles.css?url'
@@ -16,8 +19,6 @@ import type { QueryClient } from '@tanstack/react-query'
 interface MyRouterContext {
   queryClient: QueryClient
 }
-
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('kaizen-theme');if(stored==='dark'||(!stored&&window.matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -54,18 +55,29 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  console.log("[client] : rendering")
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
       <body className="font-sans wrap-anywhere antialiased selection:bg-[rgba(79,184,178,0.24)]">
         <ThemeProvider defaultTheme="system" storageKey="theme">
+          <TooltipProvider>
           {children}
+          <Toaster
+            position="top-center"
+            richColors
+            closeButton
+            toastOptions={{
+              duration: 4000,
+            }}
+          />
+          </TooltipProvider>
         </ThemeProvider>
         <TanStackDevtools
           config={{

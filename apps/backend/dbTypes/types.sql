@@ -1,0 +1,1 @@
+CREATE TYPE TokenTYPE AS ENUM ('password_reset', 'email_verification');

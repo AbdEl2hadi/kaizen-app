@@ -158,7 +158,7 @@ You can create API routes by using the `server` property in your route definitio
 import { createFileRoute } from '@tanstack/react-router'
 import { json } from '@tanstack/react-start'
 
-export const Route = createFileRoute('/api/hello')({
+export const Route = createFileRoute('/utils/hello')({
   server: {
     handlers: {
       GET: () => json({ message: 'Hello, World!' }),

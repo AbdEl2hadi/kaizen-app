@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react"
+import { Moon, Sun ,Laptop} from "lucide-react"
 
 import {
   DropdownMenu,
@@ -45,18 +45,7 @@ export function ModeToggle() {
           onClick={() => setTheme("system")}
           className="text-kaizen-gray hover:text-kaizen-primary focus:text-kaizen-primary cursor-pointer rounded-lg px-3 py-2 text-sm font-medium transition-colors focus:bg-[rgba(76,175,125,0.08)] dark:focus:bg-[rgba(76,175,125,0.12)]"
         >
-          <svg
-            className="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="5" />
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-          </svg>
+          <Laptop />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>

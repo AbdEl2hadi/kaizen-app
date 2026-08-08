@@ -1,9 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { redirectIfAuth } from '#/features/auth/guard'
+import { ForgotPasswordPage } from '#/components/auth/ForgotPasswordPage'
 
 export const Route = createFileRoute('/forgot-password')({
-  component: ForgotPassword,
+  beforeLoad: ({ context }) => redirectIfAuth(context.queryClient),
+  component: ForgotPasswordPage,
 })
-
-function ForgotPassword() {
-  return <div className="text-kaizen-charcoal p-8">Forgot Password</div>
-}

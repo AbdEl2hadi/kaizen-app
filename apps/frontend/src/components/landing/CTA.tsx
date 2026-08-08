@@ -95,9 +95,9 @@ export function CTA() {
                   📅 Calendar
                 </div>
                 <div className="mt-1 grid grid-cols-7 gap-0.5">
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d) => (
+                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d,i) => (
                     <span
-                      key={d}
+                      key={`${d}-${i}`}
                       className="text-kaizen-gray text-center text-[5px]"
                     >
                       {d}

@@ -9,7 +9,18 @@ import tailwindcss from '@tailwindcss/vite'
 const config = defineConfig({
   envDir: '../..',
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    devtools(),
+    tailwindcss(),
+    tanstackStart({
+      importProtection: {
+        client: {
+          excludeFiles: ['**/node_modules/**', 'src/features/**/server/**'],
+        },
+      },
+    }),
+    viteReact(),
+  ],
 })
 
 export default config
