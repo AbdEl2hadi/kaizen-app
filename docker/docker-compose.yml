@@ -1,4 +1,3 @@
-
 services:
   kaizen_db:
     image: postgres:16-alpine
@@ -12,5 +11,31 @@ services:
     volumes:
       - kaizen_db_data:/var/lib/postgresql/data
 
+  kaizen_test_db:
+    image: postgres:16-alpine
+    container_name: kaizen_test_db
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: kaizen_test
+    ports:
+      - "5433:5432"
+
+  kaizen_redis:
+    image: redis:8-alpine
+    container_name: kaizen_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - kaizen_redis_data:/data
+    command: redis-server --appendonly yes
+
+  kaizen_test_redis:
+    image: redis:8-alpine
+    container_name: kaizen_test_redis
+    ports:
+      - "6380:6380"
+    command: redis-server --appendonly yes
 volumes:
   kaizen_db_data:
+  kaizen_redis_data:

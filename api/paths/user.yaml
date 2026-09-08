@@ -1,0 +1,25 @@
+me:
+  get:
+    tags: [user]
+    summary: Get the authenticated user
+    description: |
+      Returns the profile of the user identified by the `session_token` cookie.
+      Requires authentication.
+    operationId: getMe
+    security:
+      - cookieAuth: []
+    responses:
+      '200':
+        description: User authenticated.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/UserResponse'
+      '401':
+        description: Missing/invalid session or user not found.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'

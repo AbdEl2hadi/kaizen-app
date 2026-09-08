@@ -47,6 +47,18 @@ export function CTA() {
         }}
         aria-label="Call to action"
       >
+        <img
+          src="/assets/cta-illustration.png"
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 mx-auto h-full w-full max-w-300 object-cover opacity-15"
+        />
+        <img
+          src="/assets/mascot-celebrating.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute right-8 bottom-10 z-1 block h-auto w-23 animate-[peekBounce_3s_ease-in-out_infinite] object-cover max-md:w-16"
+        />
         <div className="relative z-2 mx-auto max-w-300 px-6">
           <div
             className="mb-10 flex justify-center gap-5 max-[480px]:flex-wrap max-md:gap-3"
@@ -204,7 +216,7 @@ export function CTA() {
           <div className="max-[480px]:col-span-1 max-md:col-span-2">
             <div className="font-display mb-2 flex items-center gap-2 text-xl font-extrabold text-white">
               <img
-                src="/kaizen-logo-noBack.png"
+                src="/assets/kaizen-logo-noBack.png"
                 alt="Kaizen"
                 className="block h-19 w-auto"
                 style={{ filter: 'brightness(0) invert(1)' }}
@@ -355,7 +367,13 @@ function FooterCol({ title, links }: { title: string; links: string[] }) {
 function FAQs() {
   return (
     <>
-      <div className="mb-12 text-center">
+      <div className="relative mb-12 text-center">
+        <img
+          src="/assets/mascot-sleepy.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute -top-14 right-0 z-6 block h-auto w-20 animate-[float_6s_ease-in-out_infinite] object-cover max-lg:hidden"
+        />
         <span className="inline-flex items-center gap-2 rounded-[100px] bg-[#E8F5E9] px-4 py-1.5 text-xs font-semibold tracking-[0.03em] text-[#3D9B6A] uppercase dark:bg-[rgba(76,175,125,0.15)] dark:text-[#6DC99A]">
           💬 FAQ
         </span>

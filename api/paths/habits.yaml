@@ -1,0 +1,377 @@
+habit:
+  get:
+    tags: [habits]
+    summary: List habits
+    description: |
+      Returns all habits for the authenticated user, filtered by `archived`.
+      Requires authentication.
+    operationId: getHabits
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: archived
+        in: query
+        required: true
+        description: When `true`, returns archived (soft-deleted) habits; when `false`, active ones.
+        schema:
+          type: boolean
+    responses:
+      '200':
+        description: Habits fetched successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitsResponse'
+      '400':
+        description: Missing or invalid `archived` query parameter.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+  post:
+    tags: [habits]
+    summary: Create a habit
+    description: |
+      Creates a habit with the given input definition. The `inputConfig` is validated
+      against `inputType` (e.g. `select` requires non-empty `options`). Requires authentication.
+    operationId: createHabit
+    security:
+      - cookieAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/CreateHabitRequest'
+          examples:
+            checkbox:
+              summary: Daily checkbox habit
+              value:
+                name: Read 20 pages
+                icon: BookOpen
+                inputType: checkbox
+                sortOrder: 1
+            number:
+              summary: Number habit with target
+              value:
+                name: Drink water
+                icon: Droplets
+                inputType: number
+                inputConfig:
+                  target: 8
+                sortOrder: 2
+            select:
+              summary: Select habit with options
+              value:
+                name: Mood
+                icon: Smile
+                inputType: select
+                inputConfig:
+                  options: [Great, Okay, Bad]
+                sortOrder: 3
+    responses:
+      '201':
+        description: Habit created successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitResponse'
+      '400':
+        description: Invalid payload, unknown `inputType`, or invalid `inputConfig` for the type.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+habit-detail:
+  delete:
+    tags: [habits]
+    summary: Archive (soft-delete) a habit
+    description: |
+      Sets `is_active = false` for the habit. It is not removed from the database and can
+      be listed with `archived=true`. Requires authentication and ownership of the habit.
+    operationId: deleteHabit
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: habitID
+        in: path
+        required: true
+        description: UUID of the habit to archive.
+        schema:
+          type: string
+          format: uuid
+    responses:
+      '200':
+        description: Habit deleted (archived) successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitResponse'
+      '400':
+        description: Invalid `habitID` format.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '404':
+        description: Habit not found or not owned by the user.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+  patch:
+    tags: [habits]
+    summary: Update a habit
+    description: |
+      Partially updates a habit. At least one field must be provided. When `inputConfig`
+      or `inputType` is included, the merged config is validated against the effective
+      input type. Requires authentication and ownership of the habit.
+    operationId: updateHabit
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: habitID
+        in: path
+        required: true
+        description: UUID of the habit to update.
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/UpdateHabitRequest'
+          examples:
+            rename:
+              summary: Rename a habit
+              value:
+                name: Read 30 pages
+            change-input:
+              summary: Change input type and config
+              value:
+                inputType: number
+                inputConfig:
+                  target: 5
+    responses:
+      '200':
+        description: Habit updated successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitResponse'
+      '400':
+        description: Empty body (no fields to update) or invalid `inputConfig` for the type.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '404':
+        description: Habit not found or not owned by the user.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+week-logs:
+  get:
+    tags: [habits]
+    summary: Get habit logs for a week
+    description: |
+      Returns all active habits of the user with their logs within a 7-day window
+      centered on `date` (inclusive, `date − 3` to `date + 3`). Habits without logs are
+      included with an empty `logs` array. Requires authentication.
+    operationId: getWeekLogs
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: date
+        in: query
+        required: true
+        description: Center date of the week window, `YYYY-MM-DD`.
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Habit logs fetched successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitsResponse'
+      '400':
+        description: Missing or invalid `date` query parameter.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+month-logs:
+  get:
+    tags: [habits]
+    summary: Get habit logs for a month
+    description: |
+      Returns all active habits of the user with their logs for the calendar month
+      containing `date` (first to last day of that month, inclusive). Habits without logs
+      are included with an empty `logs` array. Requires authentication.
+    operationId: getMonthLogs
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: date
+        in: query
+        required: true
+        description: Any date within the month to fetch, `YYYY-MM-DD`.
+        schema:
+          type: string
+          format: date
+    responses:
+      '200':
+        description: Habit logs fetched successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/HabitsResponse'
+      '400':
+        description: Missing or invalid `date` query parameter.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+habit-log:
+  put:
+    tags: [habits]
+    summary: Set a habit log for a day
+    description: |
+      Stores (inserts or overwrites) the value for the habit on the given day. The value is
+      validated against the habit's `input.type` before persisting. Requires authentication
+      and ownership of the habit.
+    operationId: setHabitLog
+    security:
+      - cookieAuth: []
+    parameters:
+      - name: habitID
+        in: path
+        required: true
+        description: UUID of the habit to log.
+        schema:
+          type: string
+          format: uuid
+      - name: date
+        in: path
+        required: true
+        description: The day to log, `YYYY-MM-DD`.
+        schema:
+          type: string
+          format: date
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/SetHabitLogRequest'
+          examples:
+            checkbox:
+              summary: Check off a checkbox habit
+              value:
+                value: true
+            number:
+              summary: Log a number
+              value:
+                value: 6
+            percent:
+              summary: Log a percent
+              value:
+                value: 75
+            select:
+              summary: Log a select option
+              value:
+                value: Great
+            multiselect:
+              summary: Log multiple options
+              value:
+                value: [Great, Okay]
+            text:
+              summary: Log free text
+              value:
+                value: Felt focused all day
+    responses:
+      '200':
+        description: Habit log set successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '400':
+        description: Invalid `habitID`/`date`, or `value` does not match the habit's input type.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Missing/invalid session.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '404':
+        description: Habit not found or not owned by the user.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'

@@ -3,20 +3,20 @@ import { ModeToggle } from "@/components/ui/mode-toggle"
 export function Navbar() {
   return (
     <nav
-      className="fixed top-0 right-0 left-0 z-1000 h-20 border-b border-[rgba(76,175,125,0.08)] bg-transparent dark:border-[rgba(76,175,125,0.15)] dark:bg-[rgba(20,23,21,0.92)] dark:backdrop-blur-lg"
+      className="fixed top-0 right-0 left-0 z-1000"
       role="navigation"
       aria-label="Main navigation"
     >
-      <div className="mx-auto flex h-full max-w-300 items-center gap-10 px-6">
+      <div className="mx-auto mt-4 flex h-18 max-w-300 items-center gap-10 rounded-full bg-white/80 px-6 shadow-[0_8px_32px_rgba(45,59,54,0.1)] backdrop-blur-xl max-md:mx-4 dark:bg-[rgba(20,23,21,0.85)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
         <a
           href="#"
           className="font-display text-kaizen-charcoal flex shrink-0 items-center gap-2 text-2xl font-extrabold"
           aria-label="Kaizen home"
         >
           <img
-            src="/kaizen-logo-noBack.png"
+            src="/assets/kaizen-logo-noBack.png"
             alt="Kaizen"
-            className="block h-20.5 w-auto"
+            className="block h-18 w-auto"
           />
         </a>
         <div className="ml-auto flex items-center gap-6">

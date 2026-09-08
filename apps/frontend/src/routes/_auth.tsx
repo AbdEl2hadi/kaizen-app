@@ -18,10 +18,11 @@ function AuthLayout() {
 
     >
       <AppSidebar />
-      <div className="bg-background flex min-h-svh flex-1 flex-col">
+      <div className="bg-background flex min-h-svh min-w-0 flex-1 flex-col">
         <header className="border-sidebar-border/60 bg-background/80 flex h-14 shrink-0 items-center gap-3 border-b px-4 backdrop-blur-sm">
           <SidebarTrigger 
-            
+            size={"lg"}
+            className='cursor-pointer'
            />
           <div className="ml-auto">
             <ModeToggle />

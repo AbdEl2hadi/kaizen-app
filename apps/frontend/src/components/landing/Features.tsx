@@ -56,39 +56,14 @@ export function Features() {
                 </svg>
               </div>
               <div
-                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.6] dark:saturate-[0.8]"
-                style={{
-                  background: 'linear-gradient(135deg,#E8F5E9,#C8E6C9)',
-                  padding: 12,
-                }}
+                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.85]"
               >
-                <div className="mb-2 flex gap-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-1.5 w-1.5 rounded-full bg-[#C8E6C9]"></div>
-                  <div className="h-1.5 w-1.5 rounded-full bg-[#C8E6C9]"></div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#4CAF7D] text-sm font-bold text-white">
-                    A
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      className="h-1.5 rounded-sm bg-[#A5D6A7]"
-                      style={{ width: '80%' }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="mt-1.5 flex items-center gap-1.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#81C784] text-sm font-bold text-white">
-                    B
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      className="h-1.5 rounded-sm bg-[#A5D6A7]"
-                      style={{ width: '55%' }}
-                    ></div>
-                  </div>
-                </div>
+                <img
+                  src="/assets/feature-ai.png"
+                  alt="AI-powered insights illustration"
+                  className="block h-auto w-full"
+                  loading="lazy"
+                />
               </div>
               <h3 className="font-display text-kaizen-charcoal mb-2.5 text-xl font-bold">
                 AI-Powered Insights
@@ -127,30 +102,21 @@ export function Features() {
                 </svg>
               </div>
               <div
-                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.6] dark:saturate-[0.8]"
-                style={{
-                  background: 'linear-gradient(135deg,#FFF0ED,#FFCCBC)',
-                  padding: 12,
-                }}
+                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.85]"
               >
-                <div className="mb-2 flex justify-between">
-                  <div className="text-[8px] font-bold text-[#BF360C]">
-                    ↻ Habits
-                  </div>
-                  <div className="text-[8px] text-[#BF360C]">Goals</div>
-                </div>
-                <div className="flex gap-1">
-                  <div className="flex h-7.5 flex-1 items-center justify-center rounded bg-[#FFAB91] text-[9px] font-bold text-[#BF360C]">
-                    12
-                  </div>
-                  <div className="flex h-7.5 flex-1 items-center justify-center rounded bg-[#FF8A65] text-[9px] font-bold text-white">
-                    8
-                  </div>
-                  <div className="flex h-7.5 flex-1 items-center justify-center rounded bg-[#FF7043] text-[9px] font-bold text-white">
-                    5
-                  </div>
-                </div>
+                <img
+                  src="/assets/feature-tracking.png"
+                  alt="All-in-one tracking illustration"
+                  className="block h-auto w-full"
+                  loading="lazy"
+                />
               </div>
+              <img
+                src="/assets/mascot-reading.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute -right-3 -bottom-3 z-6 block h-auto w-21 animate-[float_6s_ease-in-out_infinite] object-cover max-md:hidden"
+              />
               <h3 className="font-display text-kaizen-charcoal mb-2.5 text-xl font-bold">
                 All-in-One Tracking
               </h3>
@@ -176,29 +142,21 @@ export function Features() {
                 </svg>
               </div>
               <div
-                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.6] dark:saturate-[0.8]"
-                style={{
-                  background: 'linear-gradient(135deg,#FFFDE7,#FFF9C4)',
-                  padding: 12,
-                }}
+                className="mx-auto mb-5 w-full max-w-50 overflow-hidden rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.06)] dark:brightness-[0.85]"
               >
-                <div className="mb-1.5 flex items-center gap-2">
-                  <div className="text-base">🔥</div>
-                  <div>
-                    <div className="text-[10px] font-bold text-[#F57F17]">
-                      12-Day Streak
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-0.75">
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#4CAF7D]"></div>
-                  <div className="h-3.5 w-3.5 rounded-full bg-[#C8E6C9]"></div>
-                </div>
+                <img
+                  src="/assets/feature-motivation.png"
+                  alt="Motivation illustration"
+                  className="block h-auto w-full"
+                  loading="lazy"
+                />
               </div>
+              <img
+                src="/assets/mascot-walking.png"
+                alt=""
+                aria-hidden="true"
+                className="absolute -right-3 -bottom-3 z-6 block h-auto w-21 animate-[float_6s_ease-in-out_infinite] object-cover max-md:hidden"
+              />
               <h3 className="font-display text-kaizen-charcoal mb-2.5 text-xl font-bold">
                 Motivation that Lasts
               </h3>
@@ -272,6 +230,12 @@ export function Features() {
                 </div>
               </div>
             </div>
+            <img
+              src="/assets/mascot-meditating.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute -right-2 -bottom-6 z-6 block h-auto w-25 animate-[float_7s_ease-in-out_infinite] object-cover max-lg:hidden"
+            />
           </div>
 
           <div className="relative flex justify-center max-lg:-order-1">

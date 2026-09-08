@@ -33,8 +33,47 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         title: 'Kaizen – Small Steps. Big Change.',
       },
+      {
+        name: 'description',
+        content:
+          'Track your habits, build lasting streaks, and celebrate every milestone with Kaizen — your personal growth companion.',
+      },
+      {
+        property: 'og:title',
+        content: 'Kaizen – Small Steps. Big Change.',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Track your habits, build lasting streaks, and celebrate every milestone with Kaizen.',
+      },
+      {
+        property: 'og:image',
+        content: '/assets/og-kaizen.png',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
     ],
     links: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: '/assets/favicon-32x32.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: 'any',
+        href: '/assets/kaizen-icon.png',
+      },
+      {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/assets/apple-touch-icon.png',
+      },
       {
         rel: 'stylesheet',
         href: appCss,

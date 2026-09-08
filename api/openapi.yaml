@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: Kaizen App API
+  description: |
+    Backend API for the Kaizen App.
+
+    All responses use the `APIResponse` envelope: `{ "success": true|false, "code": "...", "message": "...", "data": ... }`.
+
+    Session authentication is cookie-based: a successful login or OAuth callback sets an
+    HttpOnly `session_token` cookie. Protected routes (`/v1/api/*`) require it.
+  version: 1.0.0
+  license:
+    name: Proprietary
+servers:
+  - url: http://localhost:8080
+    description: Local development
+tags:
+  - name: auth
+    description: Registration, login/logout, email verification, password reset and OAuth (Google / Facebook)
+  - name: user
+    description: Authenticated user profile
+  - name: habits
+    description: Habit management and daily habit logs
+paths:
+  /v1/auth/register:
+    $ref: './paths/auth.yaml#/register'
+  /v1/auth/login:
+    $ref: './paths/auth.yaml#/login'
+  /v1/auth/logout:
+    $ref: './paths/auth.yaml#/logout'
+  /v1/auth/resend-verification:
+    $ref: './paths/auth.yaml#/resend-verification'
+  /v1/auth/forgot-password:
+    $ref: './paths/auth.yaml#/forgot-password'
+  /v1/auth/verify-email:
+    $ref: './paths/auth.yaml#/verify-email'
+  /v1/auth/reset-password:
+    $ref: './paths/auth.yaml#/reset-password'
+  /v1/auth/{provider}:
+    $ref: './paths/auth.yaml#/oauth-login'
+  /v1/auth/{provider}/callback:
+    $ref: './paths/auth.yaml#/oauth-callback'
+  /v1/api/me:
+    $ref: './paths/user.yaml#/me'
+  /v1/api/habits:
+    $ref: './paths/habits.yaml#/habit'
+  /v1/api/habits/{habitID}:
+    $ref: './paths/habits.yaml#/habit-detail'
+  /v1/api/habits/logs/week:
+    $ref: './paths/habits.yaml#/week-logs'
+  /v1/api/habits/logs/month:
+    $ref: './paths/habits.yaml#/month-logs'
+  /v1/api/habits/{habitID}/logs/{date}:
+    $ref: './paths/habits.yaml#/habit-log'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session_token
+      description: HttpOnly session cookie set by `POST /v1/auth/login` or the OAuth callback. Named `session_token_<env>` in non-production environments.
+  schemas:
+    User:
+      $ref: './schemas/user.yaml#/User'
+    SignupRequest:
+      $ref: './schemas/request.yaml#/SignupRequest'
+    LoginRequest:
+      $ref: './schemas/request.yaml#/LoginRequest'
+    EmailRequest:
+      $ref: './schemas/request.yaml#/EmailRequest'
+    ResetPasswordRequest:
+      $ref: './schemas/request.yaml#/ResetPasswordRequest'
+    APIResponse:
+      $ref: './schemas/response.yaml#/APIResponse'
+    UserResponse:
+      $ref: './schemas/response.yaml#/UserResponse'
+    ErrorResponse:
+      $ref: './schemas/response.yaml#/ErrorResponse'
+    HabitResponse:
+      $ref: './schemas/response.yaml#/HabitResponse'
+    HabitsResponse:
+      $ref: './schemas/response.yaml#/HabitsResponse'
+    Habit:
+      $ref: './schemas/habit.yaml#/Habit'
+    HabitInput:
+      $ref: './schemas/habit.yaml#/HabitInput'
+    HabitInputType:
+      $ref: './schemas/habit.yaml#/HabitInputType'
+    HabitInputConfig:
+      $ref: './schemas/habit.yaml#/HabitInputConfig'
+    HabitLog:
+      $ref: './schemas/habit.yaml#/HabitLog'
+    CreateHabitRequest:
+      $ref: './schemas/habit.yaml#/CreateHabitRequest'
+    UpdateHabitRequest:
+      $ref: './schemas/habit.yaml#/UpdateHabitRequest'
+    SetHabitLogRequest:
+      $ref: './schemas/habit.yaml#/SetHabitLogRequest'
+    EmailNotVerifiedError:
+      $ref: './schemas/response.yaml#/EmailNotVerifiedError'
+  responses:
+    BadRequest:
+      description: Malformed JSON payload or validation failure.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyAttempts:
+      description: Too many failed login attempts — try again later.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected server error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

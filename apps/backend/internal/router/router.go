@@ -7,29 +7,29 @@ import (
 	"time"
 
 	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/config"
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/rateLimit"
+	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/middleware"
+	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/router/v1"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/router/v1"
+	"github.com/redis/go-redis/v9"
 )
 
-func Routes(db *pgxpool.Pool, cfg *config.Config) http.Handler {
+func Routes(db *pgxpool.Pool, cfg *config.Config, rdb *redis.Client) http.Handler {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
-	r.Use(middleware.RequestID)
-	r.Use(middleware.ClientIPFromRemoteAddr)
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
+	r.Use(chiMiddleware.RequestID)
+	r.Use(chiMiddleware.ClientIPFromRemoteAddr)
+	r.Use(chiMiddleware.Logger)
+	r.Use(chiMiddleware.Recoverer)
 	if cfg.AppEnv == "production" {
-		r.Use(middleware.ClientIPFromHeader("True-Client-IP"))
+		r.Use(chiMiddleware.ClientIPFromHeader("True-Client-IP"))
 	} else {
-		r.Use(middleware.ClientIPFromRemoteAddr)
+		r.Use(chiMiddleware.ClientIPFromRemoteAddr)
 	}
-	generalLimitStore, err := rateLimit.NewStore(100, time.Minute)
+	generalLimitStore, err := middleware.NewStore(100, time.Minute)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +37,7 @@ func Routes(db *pgxpool.Pool, cfg *config.Config) http.Handler {
 	if cfg.AppEnv == "production" {
 		header = "True-Client-IP"
 	}
-	generalLimit, err := rateLimit.NewLimitMiddleware(generalLimitStore, header)
+	generalLimit, err := middleware.NewLimitMiddleware(generalLimitStore, header)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func Routes(db *pgxpool.Pool, cfg *config.Config) http.Handler {
 	// Set a timeout value on the request context (ctx), that will signal.
 	// through ctx.Done() that the request has timed out and further.
 	// processing should be stopped.
-	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(chiMiddleware.Timeout(60 * time.Second))
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
@@ -57,7 +57,7 @@ func Routes(db *pgxpool.Pool, cfg *config.Config) http.Handler {
 	}))
 
 	r.Get("/health", healthCheckHandler(db))
-	r.Mount("/v1", v1.Router(db, cfg))
+	r.Mount("/v1", v1.Router(db, cfg, rdb))
 
 	return r
 }

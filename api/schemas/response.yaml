@@ -1,0 +1,68 @@
+APIResponse:
+  type: object
+  description: Base envelope for every API response.
+  required:
+    - success
+  properties:
+    success:
+      type: boolean
+    code:
+      type: string
+      description: Stable machine-readable error code. Present on errors only.
+    message:
+      type: string
+      description: Human-readable message.
+    data:
+      description: Response payload.
+
+UserResponse:
+  allOf:
+    - $ref: '#/APIResponse'
+    - type: object
+      properties:
+        data:
+          $ref: './user.yaml#/User'
+
+ErrorResponse:
+  allOf:
+    - $ref: '#/APIResponse'
+    - type: object
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+
+EmailNotVerifiedError:
+  allOf:
+    - $ref: '#/APIResponse'
+    - type: object
+      properties:
+        code:
+          type: string
+          enum: [EMAIL_NOT_VERIFIED]
+        data:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              description: The email that needs verification.
+          required: [email]
+
+HabitResponse:
+  allOf:
+    - $ref: '#/APIResponse'
+    - type: object
+      properties:
+        data:
+          $ref: './habit.yaml#/Habit'
+
+HabitsResponse:
+  allOf:
+    - $ref: '#/APIResponse'
+    - type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: './habit.yaml#/Habit'

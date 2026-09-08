@@ -1,0 +1,79 @@
+SignupRequest:
+  type: object
+  description: Registration payload.
+  required:
+    - fullName
+    - username
+    - email
+    - password
+    - confirmPassword
+    - dateOfBirth
+    - timeZone
+  properties:
+    fullName:
+      type: string
+      maxLength: 100
+    username:
+      type: string
+      minLength: 5
+      maxLength: 20
+      pattern: '^[a-z][a-z0-9._]{3,18}[a-z0-9]$'
+      description: Must start with a letter, end with a letter/digit, contain only lowercase letters, digits, dots and underscores, with no consecutive `.`/`_`.
+    email:
+      type: string
+      format: email
+    password:
+      type: string
+      minLength: 8
+      format: password
+    confirmPassword:
+      type: string
+      format: password
+      description: Must equal `password`.
+    dateOfBirth:
+      type: string
+      format: date
+      description: Must be at least 13 years in the past.
+    timeZone:
+      type: string
+      description: Valid IANA timezone name, e.g. `Africa/Cairo`.
+
+LoginRequest:
+  type: object
+  description: Login payload. `identity` accepts either an email or a username.
+  required:
+    - identity
+    - password
+  properties:
+    identity:
+      type: string
+      description: Email or username.
+    password:
+      type: string
+      format: password
+
+EmailRequest:
+  type: object
+  description: Payload for `resend-verification` and `forgot-password`.
+  required:
+    - email
+  properties:
+    email:
+      type: string
+      format: email
+
+ResetPasswordRequest:
+  type: object
+  description: Payload for `reset-password`.
+  required:
+    - password
+    - confirmPassword
+  properties:
+    password:
+      type: string
+      minLength: 8
+      format: password
+    confirmPassword:
+      type: string
+      format: password
+      description: Must equal `password`.

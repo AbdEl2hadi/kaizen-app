@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { redirectIfAuth } from '#/features/auth/guard'
-import { ResetPasswordPage } from '#/components/auth/ResetPasswordPage'
+import { ResetPasswordPage } from '#/features/auth/components/ResetPasswordPage'
 
 const resetPasswordSearchSchema = z.object({
   token: z.string().optional(),

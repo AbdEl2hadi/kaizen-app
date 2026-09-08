@@ -14,9 +14,9 @@ import (
 func Init(cfg *config.Config) {
 
 	var (
-		key    string = cfg.GothSecret
-		maxAge int    = 86400 * 30
-		isProd bool   = cfg.AppEnv == "production"
+		key    = cfg.GothSecret
+		maxAge = 86400 * 30
+		isProd = cfg.AppEnv == "production"
 	)
 
 	store := sessions.NewCookieStore([]byte(key))

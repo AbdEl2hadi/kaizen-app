@@ -1,34 +1,39 @@
+import { useEffect, useRef } from 'react'
+
 import { Safari } from '../ui/safari'
 
-function cloud({
-  color,
-  style,
-}: {
-  color: string | undefined
-  style: React.CSSProperties | undefined
-}) {
-  return (
-    <svg
-      className="pointer-events-none absolute z-10"
-      style={style}
-      viewBox="0 0 200 120"
-      fill="none"
-    >
-      <path
-        d="M40,100 C20,100 0,85 0,65 C0,45 12,28 30,25 C32,10 48,0 65,0 C78,0 90,6 95,18 C100,8 115,0 130,0 C150,0 165,12 168,30 C185,32 200,48 200,68 C200,88 185,100 165,100 Z"
-        fill={color}
-      />
-    </svg>
-  )
-}
-
 export function Hero() {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => {
+      if (mq.matches) videoRef.current?.pause()
+    }
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
   return (
     <>
       <section
         className="relative overflow-hidden bg-[linear-gradient(135deg,#e8f5e9_0%,#fffde7_40%,#fff0ed_70%,#f1f8e9_100%)] pt-40 pb-25 max-[480px]:pt-25 max-[480px]:pb-10 max-md:pt-30 max-md:pb-15 dark:bg-[linear-gradient(135deg,#0e1f12_0%,#1e1f12_40%,#241514_70%,#121f12_100%)]"
         aria-label="Hero"
       >
+        <video
+          ref={videoRef}
+          className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-multiply [mask-image:radial-gradient(ellipse_80%_80%_at_50%_35%,black_50%,transparent_100%)] dark:opacity-25 dark:mix-blend-normal"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+        >
+          <source src="/assets/Ink_diffusing_in_water.mp4" type="video/mp4" />
+        </video>
+
         <div className="mx-auto grid max-w-300 grid-cols-1 items-center gap-15 px-6 max-lg:text-center lg:grid-cols-2">
           <div>
             <div className="mb-4 flex flex-wrap gap-2">
@@ -85,27 +90,6 @@ export function Hero() {
             className="relative flex min-h-120 items-center justify-center max-lg:mt-10 max-lg:min-h-100"
             aria-hidden="true"
           >
-            {cloud({
-              color: '#4CAF7D',
-              style: {
-                width: 220,
-                height: 140,
-                top: -30,
-                right: -20,
-                opacity: 0.25,
-              },
-            })}
-            {cloud({
-              color: '#FF6F5E',
-              style: {
-                width: 160,
-                height: 100,
-                bottom: -10,
-                left: -40,
-                opacity: 0.2,
-              },
-            })}
-
             <Safari
               url="Kaizen-app/dashboard"
               mode="simple"
@@ -113,7 +97,7 @@ export function Hero() {
             />
 
             <img
-              src="/moscot-noback.png"
+              src="/assets/moscot-noback.png"
               alt=""
               className="absolute -right-5 -bottom-4 z-6 block h-auto w-27.5 animate-[peekBounce_3s_ease-in-out_infinite] object-cover max-md:-right-2.5 max-md:-bottom-2.5 max-md:w-19"
             />

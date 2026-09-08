@@ -8,16 +8,18 @@ import (
 )
 
 type Config struct {
-	Port        string `env:"PORT" envDefault:":8080"`
-	DataBaseURL string `env:"DATABASE_URL,required"`
-	JWTSecret   string `env:"JWT_SECRET,required"`
-	FrontendURL string `env:"FRONTEND_URL,required"`
-	BackendURL  string `env:"BACKEND_URL,required"`
-	AppEnv      string `env:"APP_ENV" envDefault:"development"`
-	GothSecret  string `env:"GOTH_SECRET,required"`
-	SMTP        SMTPConfig
-	Google      GoogleConfig
-	Facebook    FacebookConfig
+	Port            string `env:"PORT" envDefault:":8080"`
+	DataBaseURL     string `env:"DATABASE_URL,required"`
+	RedisURL        string `env:"REDIS_URL,required"`
+	TestDataBaseURL string `env:"TEST_DATABASE_URL,required"`
+	JWTSecret       string `env:"JWT_SECRET,required"`
+	FrontendURL     string `env:"FRONTEND_URL,required"`
+	BackendURL      string `env:"BACKEND_URL,required"`
+	AppEnv          string `env:"APP_ENV" envDefault:"development"`
+	GothSecret      string `env:"GOTH_SECRET,required"`
+	SMTP            SMTPConfig
+	Google          GoogleConfig
+	Facebook        FacebookConfig
 }
 type SMTPConfig struct {
 	Host string `env:"SMTP_HOST,required"`

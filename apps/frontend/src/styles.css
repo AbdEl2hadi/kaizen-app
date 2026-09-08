@@ -342,7 +342,6 @@ body:has([data-slot='dropdown-menu-content'][data-state='open']) {
 :focus-visible {
   outline: 2px solid var(--kaizen-primary);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .sr-only {

@@ -29,19 +29,34 @@ export type SidebarNavItem = {
   subItems?: SidebarNavSubItem[]
 }
 
-export const navItems = [
-  { title: 'Dashboard', url:'/dashboard' , icon: LayoutDashboard },
+export type SidebarNavGroup = {
+  label: string
+  items: readonly SidebarNavItem[]
+}
+
+export const navGroups = [
   {
-    title: 'Habit',
-    icon: Repeat,
-    subItems: [
-      { title: 'Daily Log', url : '/habit/daily-log' ,icon: ClipboardList  },
-      { title: 'Goals & Challenges', url : '/habit/goals-chanlenges' ,  icon: Target },
-      { title: 'TO-DOs', url: "/habit/to-dos", icon: ListTodo },
-      { title: 'Performance',url: "/habit/performance" , icon: TrendingUp },
+    label: 'Overview',
+    items: [
+      { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+      { title: 'Calendar', url: '/calendar', icon: CalendarDays },
+      { title: 'Achievements', url: '/achievements', icon: Trophy },
     ],
   },
-  { title: 'Calendar', url: "/calendar" ,  icon: CalendarDays },
-  { title: 'Achievements', url:"/achievements" ,icon: Trophy },
-  { title: 'Settings', url :"/settings" , icon: Settings },
-] as const satisfies readonly SidebarNavItem[]
+  {
+    label: 'Manage',
+    items: [
+      {
+        title: 'Habit',
+        icon: Repeat,
+        subItems: [
+          { title: 'Daily Log', url: '/habit/daily-log', icon: ClipboardList },
+          { title: 'Goals & Challenges', url: '/habit/goals-chanlenges', icon: Target },
+          { title: 'TO-DOs', url: '/habit/to-dos', icon: ListTodo },
+          { title: 'Performance', url: '/habit/performance', icon: TrendingUp },
+        ],
+      },
+      { title: 'Settings', url: '/settings', icon: Settings },
+    ],
+  },
+] as const satisfies readonly SidebarNavGroup[]

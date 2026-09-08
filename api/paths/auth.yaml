@@ -1,0 +1,334 @@
+register:
+  post:
+    tags: [auth]
+    security: []
+    summary: Register a new user
+    description: |
+      Creates a user with the `credential` provider and sends a verification email
+      containing a 30-minute token. The returned user has `emailVerified: false`
+      until `POST /v1/auth/verify-email` is called.
+    operationId: register
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/SignupRequest'
+          examples:
+            default:
+              value:
+                fullName: John Doe
+                username: john_doe
+                email: john@example.com
+                password: superSecret123
+                confirmPassword: superSecret123
+                dateOfBirth: '1995-06-15'
+                timeZone: Africa/Cairo
+    responses:
+      '201':
+        description: User created successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/UserResponse'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+login:
+  post:
+    tags: [auth]
+    security: []
+    summary: Log in with email or username
+    description: |
+      Validates credentials (max 5 failed attempts per IP/email before a lockout).
+      On success sets the HttpOnly `session_token` cookie (7-day session).
+      If the email is unverified, returns `403` with code `EMAIL_NOT_VERIFIED`
+      and the user's email in `data`.
+    operationId: login
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/LoginRequest'
+          examples:
+            default:
+              value:
+                identity: john@example.com
+                password: superSecret123
+    responses:
+      '200':
+        description: Logged in. `session_token` cookie is set.
+        headers:
+          Set-Cookie:
+            description: "`session_token=<token>; Path=/; HttpOnly; SameSite=Lax` (plus `Secure` in production)."
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/UserResponse'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '403':
+        description: |
+          Email not verified, or account disabled.
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '../openapi.yaml#/components/schemas/EmailNotVerifiedError'
+                - $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '429':
+        $ref: '../openapi.yaml#/components/responses/TooManyAttempts'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+logout:
+  post:
+    tags: [auth]
+    security: []
+    summary: Log out
+    description: |
+      Deletes the server-side session matching the `session_token` cookie (if present)
+      and clears the cookie. Safe to call without a session.
+    operationId: logout
+    responses:
+      '200':
+        description: Logged out successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+resend-verification:
+  post:
+    tags: [auth]
+    security: []
+    summary: Resend email verification
+    description: |
+      Issues a new 30-minute verification token and emails it. Silently succeeds if the
+      email is unknown or already verified (no account enumeration). Rate-limited to one
+      email per 60 seconds.
+    operationId: resendVerificationEmail
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/EmailRequest'
+    responses:
+      '200':
+        description: New verification link sent.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '429':
+        description: Rate limit exceeded — wait 60 seconds before requesting another email.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+forgot-password:
+  post:
+    tags: [auth]
+    security: []
+    summary: Request a password reset link
+    description: |
+      Issues a 30-minute password reset token and emails it. Silently succeeds if the
+      email is unknown (no account enumeration). Rate-limited to one email per 60 seconds.
+    operationId: forgotPassword
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/EmailRequest'
+    responses:
+      '200':
+        description: Password reset link sent.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '400':
+        $ref: '../openapi.yaml#/components/responses/BadRequest'
+      '429':
+        description: Rate limit exceeded — wait 60 seconds before requesting another email.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+verify-email:
+  post:
+    tags: [auth]
+    security: []
+    summary: Verify an email address
+    description: |
+      Consumes the single-use token sent by email and marks the user's email as verified.
+    operationId: verifyEmail
+    parameters:
+      - name: token
+        in: query
+        required: true
+        description: Single-use email verification token from the verification link.
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Email verified successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '400':
+        description: Missing `token` query parameter.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Token is not valid or expired.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+reset-password:
+  post:
+    tags: [auth]
+    security: []
+    summary: Reset a forgotten password
+    description: |
+      Consumes the single-use token sent by email, sets the new password and
+      revokes all existing sessions.
+    operationId: resetPassword
+    parameters:
+      - name: token
+        in: query
+        required: true
+        description: Single-use password reset token from the reset link.
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '../openapi.yaml#/components/schemas/ResetPasswordRequest'
+    responses:
+      '200':
+        description: Password reset successfully.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/APIResponse'
+      '400':
+        description: Missing `token` query parameter or invalid payload.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '401':
+        description: Token is not valid or expired.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'
+
+oauth-login:
+  get:
+    tags: [auth]
+    security: []
+    summary: Start OAuth flow (Google / Facebook)
+    description: |
+      Redirects the browser to the provider's authorization page. No session is
+      created here; the provider redirects back to the callback afterwards.
+    operationId: oauthLogin
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        description: OAuth provider name.
+        schema:
+          type: string
+          enum: [google, facebook]
+    responses:
+      '302':
+        description: Redirect to the provider's consent screen.
+        headers:
+          Location:
+            description: Provider authorization URL.
+            schema:
+              type: string
+              format: uri
+
+oauth-callback:
+  get:
+    tags: [auth]
+    security: []
+    summary: OAuth callback
+    description: |
+      Called by the provider after the user consents. Exchanges the auth code,
+      creates or links the user account, sets the `session_token` cookie and
+      redirects to the frontend URL. Pre-existing verified accounts are linked to
+      the provider; unverified accounts are replaced.
+    operationId: oauthCallback
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        description: OAuth provider name.
+        schema:
+          type: string
+          enum: [google, facebook]
+    responses:
+      '307':
+        description: Session created, redirect to the frontend URL.
+        headers:
+          Location:
+            description: Frontend URL from config.
+            schema:
+              type: string
+              format: uri
+          Set-Cookie:
+            description: "`session_token=<token>; Path=/; HttpOnly; SameSite=Lax` (plus `Secure` in production)."
+            schema:
+              type: string
+      '401':
+        description: Provider auth failed.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '403':
+        description: Account disabled.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '409':
+        description: Email already registered to another account.
+        content:
+          application/json:
+            schema:
+              $ref: '../openapi.yaml#/components/schemas/ErrorResponse'
+      '500':
+        $ref: '../openapi.yaml#/components/responses/InternalError'

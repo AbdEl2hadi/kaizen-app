@@ -5,33 +5,39 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/Repository"
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/auth"
+	redisCache "github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/cache/redis"
 	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/config"
+	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/db/sqlc"
+	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/mail"
 	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/middleware"
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/rateLimit"
-	"github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/user"
+	auth "github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/modules/auth/v1"
+	habits "github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/modules/habits/v1"
+	user "github.com/AbdEl2hadi/kaizen-app/apps/backend/internal/modules/user/v1"
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
-func Router(db *pgxpool.Pool, cfg *config.Config) http.Handler {
+func Router(db *pgxpool.Pool, cfg *config.Config, rdb *redis.Client) http.Handler {
 	v1Router := chi.NewRouter()
-
+	/*cache system */
+	cache := redisCache.New(rdb)
 	/*services*/
-	authService := auth.NewService(db, cfg)
-	userService := user.NewService(db, cfg)
+	authService := auth.NewService(db, cfg, mail.NewGmailMailer(cfg.SMTP), cache)
+	userService := user.NewService(db, cfg, cache)
+	habitService := habits.NewService(db, cfg, cache)
 
 	/*handlers*/
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, cfg)
 	userHandler := user.NewHandler(userService)
+	habitsHandler := habits.NewHandler(habitService)
 
 	/*middleware*/
-	m := middleware.NewMiddleware(Repository.New(db), cfg)
+	m := middleware.NewMiddleware(sqlc.New(db), cfg, cache)
 
 	/*RATE LIMITING */
-	authStore, err := rateLimit.NewStore(10, time.Minute)
+	authStore, err := middleware.NewStore(10, time.Minute)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,7 +45,7 @@ func Router(db *pgxpool.Pool, cfg *config.Config) http.Handler {
 	if cfg.AppEnv == "production" {
 		header = "True-Client-IP"
 	}
-	authRL, err := rateLimit.NewLimitMiddleware(authStore, header)
+	authRL, err := middleware.NewLimitMiddleware(authStore, header)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,13 +58,15 @@ func Router(db *pgxpool.Pool, cfg *config.Config) http.Handler {
 
 	/*Mounts handler*/
 	//public routes
-	v1Router.Route("/auth", func(v1 chi.Router) {
-		v1.Use(authRL.Handle)
-		v1.Mount("/", auth.Routes(authHandler))
+	v1Router.Route("/auth", func(r chi.Router) {
+		r.Use(authRL.Handle)
+		r.Mount("/", auth.Routes(authHandler))
 	})
-	v1Router.Route("/api", func(v1 chi.Router) {
-		v1.Use(m.AuthMiddleware)
-		v1.Mount("/", user.Routes(userHandler))
+	//private routes
+	v1Router.Route("/api", func(r chi.Router) {
+		r.Use(m.AuthMiddleware)
+		r.Mount("/", user.Routes(userHandler))
+		r.Mount("/habits", habits.Routes(habitsHandler))
 
 	})
 	return v1Router

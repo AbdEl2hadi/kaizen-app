@@ -1,0 +1,155 @@
+HabitInputType:
+  type: string
+  enum:
+    - checkbox
+    - text
+    - number
+    - select
+    - multiselect
+    - percent
+    - date
+    - files
+    - url
+
+HabitInputConfig:
+  type: object
+  description: |
+    Input-specific configuration. Only the fields relevant to the `type` are used:
+
+    - `select` / `multiselect` → `options` (required, non-empty)
+    - `number` → `target` (max/target value, must be >= 0)
+    - `percent` → `target` (must be between 0 and 100)
+    - all other types → must be empty
+  properties:
+    options:
+      type: array
+      description: Options for `select` and `multiselect` inputs. Must be non-empty with no duplicates.
+      items:
+        type: string
+    target:
+      type: integer
+      minimum: 0
+      description: Target/max value for `number` inputs; 0–100 for `percent`.
+
+HabitInput:
+  type: object
+  description: The input definition of a habit.
+  required:
+    - type
+  properties:
+    type:
+      $ref: '#/HabitInputType'
+    config:
+      $ref: '#/HabitInputConfig'
+
+HabitLog:
+  type: object
+  description: A single day's log entry for a habit.
+  required:
+    - date
+    - value
+  properties:
+    date:
+      type: string
+      format: date
+      description: The day the value was logged, `YYYY-MM-DD`.
+    value:
+      description: |
+        The logged value. Shape depends on `input.type`:
+
+        - `checkbox` → boolean
+        - `number` / `percent` → number (percent must be 0–100, number ≤ `config.target` when set)
+        - `select` → one of `config.options`
+        - `multiselect` → array of `config.options`
+        - `date` → `YYYY-MM-DD` string
+        - `url` → http(s) URL string
+        - `text` / `files` → string (max 1000 chars)
+
+Habit:
+  type: object
+  description: A habit with its input definition. `logs` is only present on the week/month log endpoints.
+  required:
+    - id
+    - name
+    - icon
+    - input
+    - sortOrder
+    - isActive
+  properties:
+    id:
+      type: string
+      format: uuid
+    name:
+      type: string
+      maxLength: 100
+    icon:
+      type: string
+      maxLength: 50
+    input:
+      $ref: '#/HabitInput'
+    sortOrder:
+      type: integer
+      format: int32
+    isActive:
+      type: boolean
+      description: "`false` when the habit is archived (deleted)."
+    logs:
+      type: array
+      description: Log entries within the requested date range. Empty array when none exist.
+      items:
+        $ref: '#/HabitLog'
+
+CreateHabitRequest:
+  type: object
+  description: Payload for creating a habit.
+  required:
+    - name
+    - icon
+    - inputType
+    - sortOrder
+  properties:
+    name:
+      type: string
+      maxLength: 100
+    icon:
+      type: string
+      maxLength: 50
+    inputType:
+      $ref: '#/HabitInputType'
+    inputConfig:
+      $ref: '#/HabitInputConfig'
+    sortOrder:
+      type: integer
+      format: int32
+
+UpdateHabitRequest:
+  type: object
+  description: |
+    Partial update payload. All fields are optional, but at least one must be provided.
+    When `inputConfig` and/or `inputType` are present, the merged configuration is
+    validated against the (effective) input type.
+  properties:
+    name:
+      type: string
+      maxLength: 100
+    icon:
+      type: string
+      maxLength: 50
+    inputType:
+      $ref: '#/HabitInputType'
+    inputConfig:
+      $ref: '#/HabitInputConfig'
+    sortOrder:
+      type: integer
+      format: int32
+
+SetHabitLogRequest:
+  type: object
+  description: Payload for logging a value for a habit on a specific day.
+  required:
+    - value
+  properties:
+    value:
+      description: |
+        The value to store for the day. Shape depends on the habit's `input.type`
+        (see `HabitLog.value`). Rejected with `400` if it does not match.

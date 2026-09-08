@@ -1,0 +1,59 @@
+User:
+  type: object
+  description: Public user profile returned by auth and `/v1/api/me` endpoints.
+  required:
+    - id
+    - username
+    - phoneNumber
+    - fullName
+    - email
+    - emailVerified
+    - bio
+    - image
+    - createdAt
+    - updatedAt
+    - dateOfBirth
+    - timezone
+  properties:
+    id:
+      type: string
+      format: uuid
+      description: User ID (UUID v7).
+    username:
+      type: string
+      minLength: 5
+      maxLength: 20
+      pattern: '^[a-z][a-z0-9._]{3,18}[a-z0-9]$'
+      description: Lowercase username; no consecutive dots/underscores.
+    phoneNumber:
+      type: string
+      nullable: true
+      description: May be an empty string when not set.
+    fullName:
+      type: string
+      maxLength: 100
+    email:
+      type: string
+      format: email
+    emailVerified:
+      type: boolean
+    bio:
+      type: string
+      nullable: true
+    image:
+      type: string
+      nullable: true
+      description: URL of the profile picture.
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+    dateOfBirth:
+      type: string
+      format: date
+    timezone:
+      type: string
+      nullable: true
+      description: IANA timezone name, e.g. `Europe/London`.
